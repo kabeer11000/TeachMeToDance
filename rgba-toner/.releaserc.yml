@@ -1,0 +1,17 @@
+plugins:
+  - - '@semantic-release/commit-analyzer'
+    - config: '@commitlint/config-conventional'
+  - - '@semantic-release/release-notes-generator'
+    - config: '@commitlint/config-conventional'
+  - '@semantic-release/changelog'
+  - - '@semantic-release/git'
+    - assets:
+        - 'CHANGELOG.md'
+        - 'package.json'
+        - 'yarn.lock'
+      message: 'chore(release): ${nextRelease.version}'
+  - - '@semantic-release/gitlab'
+    - assets:
+        - path: 'CHANGELOG.md'
+          label: 'Changelog'
+  - '@semantic-release/npm'

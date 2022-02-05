@@ -1,0 +1,51 @@
+{
+  "name": "@kabeersnetwork/rgba-by",
+  "version": "1.0.0",
+  "description": "RGBA based color filtering library",
+  "main": "lib/index.js",
+  "types": "lib/types/index.d.ts",
+  "license": "MIT",
+  "files": [
+    "lib"
+  ],
+  "author": {
+    "email": "kabeersnetwork@gmail.com",
+    "name": "Kabeer's Network Authors"
+  },
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kabeer11000/rgba-by.git"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "scripts": {
+    "build": "rimraf lib && tsc",
+    "format": "prettier --write 'src/**/*' '*.{yml,json}'"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^7.6.1",
+    "@commitlint/config-conventional": "^7.6.0",
+    "@commitlint/prompt-cli": "^7.6.1",
+    "@semantic-release/changelog": "^3.0.2",
+    "@semantic-release/commit-analyzer": "^6.1.0",
+    "@semantic-release/git": "^7.0.8",
+    "@semantic-release/gitlab": "^3.1.2",
+    "@semantic-release/npm": "^5.1.7",
+    "@semantic-release/release-notes-generator": "^7.1.4",
+    "husky": "^2.3.0",
+    "lint-staged": "^8.1.7",
+    "prettier": "^1.17.1",
+    "rimraf": "^2.6.3",
+    "semantic-release": "^15.13.12",
+    "tslib": "^1.9.3",
+    "typescript": "^3.4.5"
+  },
+  "keywords": [
+    "RGB",
+    "Colors",
+    "instagram",
+    "filters"
+  ]
+}

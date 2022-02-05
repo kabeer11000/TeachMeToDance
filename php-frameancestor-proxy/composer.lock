@@ -1,0 +1,55 @@
+{
+  "_readme": [
+    "This file locks the dependencies of your project to a known state",
+    "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+    "This file is @generated automatically"
+  ],
+  "content-hash": "0bb5b5747565b4dcc051835333994b35",
+  "packages": [
+    {
+      "name": "lfkeitel/phptotp",
+      "version": "v1.0.0",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/lfkeitel/php-totp.git",
+        "reference": "2211fb6e025d3c10362771c54c9a9ad5593a3469"
+      },
+      "dist": {
+        "type": "zip",
+        "url": "https://api.github.com/repos/lfkeitel/php-totp/zipball/2211fb6e025d3c10362771c54c9a9ad5593a3469",
+        "reference": "2211fb6e025d3c10362771c54c9a9ad5593a3469",
+        "shasum": ""
+      },
+      "require": {
+        "php": "^5.6 || ^7.0"
+      },
+      "type": "library",
+      "autoload": {
+        "psr-4": {
+          "lfkeitel\\phptotp\\": "src/"
+        }
+      },
+      "notification-url": "https://packagist.org/downloads/",
+      "license": [
+        "MIT"
+      ],
+      "description": "TOTP/HOTP library for PHP",
+      "keywords": [
+        "Authentication",
+        "hotp",
+        "totp",
+        "two-factor"
+      ],
+      "time": "2017-02-06T17:46:14+00:00"
+    }
+  ],
+  "packages-dev": [],
+  "aliases": [],
+  "minimum-stability": "stable",
+  "stability-flags": [],
+  "prefer-stable": false,
+  "prefer-lowest": false,
+  "platform": [],
+  "platform-dev": [],
+  "plugin-api-version": "1.1.0"
+}

@@ -1,0 +1,7 @@
+'src/**/*':
+  - prettier --write
+  - git add
+
+'*.{yml,json}':
+  - prettier --write
+  - git add
