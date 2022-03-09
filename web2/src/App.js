@@ -55,7 +55,6 @@ const App = () => {
                             </Paper>
                         </Grow>
                     </Route>
-
                     {/*<Container></Container>*/}
                 </ReelProvider>
             </Fragment>

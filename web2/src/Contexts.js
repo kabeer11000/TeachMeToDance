@@ -1,5 +1,8 @@
 import React from "react";
 
+// const host = "http://192.168.10.6:3001";
+const host = "http://localhost:3001";
+
 function getRandomizer(bottom, top) {
     return function () {
         return Math.floor(Math.random() * (1 + top - bottom)) + bottom;
@@ -24,14 +27,14 @@ export const ReelProvider = ({children}) => {
                 return items[index]
             },
             next: async ({thisIndex: index}) => {
-                const next = await fetch("http://localhost:3001/img/" + items[index].next).then(res => res.json())
+                const next = await fetch(`${host}/img/` + items[index].next).then(res => res.json())
                 await ReelUtils.Items.push(next);
                 console.log("Requesting next")
             }
         }
     };
     React.useEffect(() => {
-        fetch("http://localhost:3001/img").then((r) => r.json()).then(ReelUtils.Items.push);
+        fetch(`${host}/img`).then((r) => r.json()).then(ReelUtils.Items.push);
     }, [])
     return (<ReelContext.Provider value={{
         ReelUtils: ReelUtils

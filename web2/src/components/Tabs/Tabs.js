@@ -117,7 +117,6 @@ export default function AppTabbedLayout() {
                     {/*</Routes>*/}
                 </TabPanel>
             </SwipeableViews>
-
         </Box>
     );
 }

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import './api/pose-animator/1camera';
 
 ReactDOM.render(
     // <React.StrictMode>
