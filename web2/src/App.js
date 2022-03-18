@@ -27,6 +27,10 @@ const App = () => {
             {/*<Switch>*/}
             <Fragment>
                 <CssBaseline/>
+
+                <Route path={"/create/animation/new"}>
+                    <div></div>
+                </Route>
                 <ReelProvider>
                     <Route path={"/"}>
                         <Tabs/>

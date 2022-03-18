@@ -8,6 +8,7 @@ import Player from "../Player/Player.lazy";
 import {Route} from "react-router-dom";
 import {Fab} from "@mui/material";
 import styled from "@emotion/styled";
+import {PoseAnimator} from "../../api/pose-animator/1camera";
 
 function TabPanel(props) {
     const {children, value, index, ...other} = props;
@@ -54,7 +55,7 @@ const StyledFab = styled(Fab)({
 });
 export default function AppTabbedLayout() {
     const theme = useTheme();
-    const [value, setValue] = React.useState(1);
+    const [value, setValue] = React.useState(0);
     const [bottomNav, setBottomNav] = React.useState(0);
 
     const handleChange = (event, newValue) => {
@@ -65,16 +66,43 @@ export default function AppTabbedLayout() {
         setValue(index);
     };
     const videoRef = createRef();
-    const userMediaToVideo = async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: true
+    const canvasRef = createRef();
+    // const userMediaToVideo = async () => {
+    //     const stream = await navigator.mediaDevices.getUserMedia({
+    //         video: true
+    //     });
+    //     const video = videoRef.current;
+    //     video.srcObject = stream;
+    // }
+    const loadAnimator = async () => {
+        const animator = new PoseAnimator({
+            Canvas: canvasRef.current,
+            MediaStream: await navigator.mediaDevices.getUserMedia({
+                'audio': false,
+                'video': {
+                    facingMode: 'user',
+                    width: 200,
+                    height: 200,
+                },
+            }),
+            Video: videoRef.current,
+            VideoCanvas: document.querySelector(".camera-canvas-output"),
+            SVG: "https://raw.githubusercontent.com/yemount/pose-animator/master/resources/illustration/boy.svg"
         });
-        const video = videoRef.current;
-        video.srcObject = stream;
+        await animator.Build();
+        const _ = async () => {
+            // console.log("F")
+            const poses = await animator.DetectFrame();
+            await animator.DrawFrame({poses: poses[0]})
+            requestAnimationFrame(_)
+        }
+        await _()
+        // console.log()
     }
     useEffect(() => {
         if (value === 0) {
-            userMediaToVideo();
+            // userMediaToVideo();
+            if (canvasRef && videoRef) loadAnimator();
         }
     }, [value]);
 
@@ -100,11 +128,25 @@ export default function AppTabbedLayout() {
                 onChangeIndex={handleChangeIndex}
             >
                 <TabPanel value={value} index={0} dir={theme.direction}>
-                    <video autoPlay={true} ref={videoRef} style={{
+                    <div style={{
                         width: "100vw",
-                        height: "100vh",
-                        objectFit: "cover"
-                    }}/>
+                        height: "100vh"
+                    }}>
+                        <canvas style={{
+                            width: "100vw",
+                            height: "100vh",
+                            objectFit: "cover"
+                        }} ref={canvasRef} className="camera-canvas" id="output"/>
+
+                        <video autoPlay={true} ref={videoRef} style={{
+                            width: "4rem",
+                            height: "6rem",
+                            position: "fixed",
+                            bottom: "0.5rem",
+                            right: "3rem"
+                            // objectFit: "cover"
+                        }}/>
+                    </div>
                 </TabPanel>
                 <TabPanel value={value} index={1} dir={theme.direction}>
                     {/*<Routes>*/}

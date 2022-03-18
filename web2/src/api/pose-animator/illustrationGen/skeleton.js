@@ -699,7 +699,7 @@ export class Skeleton {
                 selectedGroups.push(this.boneGroups[key]);
             }
         });
-        return selectedGroups.flatten();
+        return selectedGroups.flat();//.flatten();
     }
 
     getTotalBoneLength(bones) {

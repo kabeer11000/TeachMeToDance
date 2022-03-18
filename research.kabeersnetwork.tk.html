@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        // marked
+    </script>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <title>Static Template</title>
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"
+          integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" rel="stylesheet">
+</head>
+<body>
+<h1>Kabeer's Network Research</h1>
+<div class="container">
+</div>
+<iframe class="rendering-frame" hidden sandbox="allow-scripts allow-same-origin"></iframe>
+<script src="https://cdn.jsdelivr.net/gh/1904labs/dom-to-image-more@2.9.5/src/dom-to-image-more.js"></script>
+<script type="module">
+    // import domtoimage from "https://cdn.jsdelivr.net/gh/1904labs/dom-to-image-more@2.9.5/src/dom-to-image-more.js";
+    const _ = async (item) => {
+        const html_doc = await (await fetch("https://cdn.jsdelivr.net/gh/kabeer11000/docs-hosted@redirector-content/law.research.kabeersnetwork.tk/blog/audio/noise-control/user-implemented-aftermarket-anc-algorithms/index.html" || "https://raw.githubusercontent.com/kabeer11000/docs-hosted/redirector-content/law.research.kabeersnetwork.tk/blog/audio/noise-control/user-implemented-aftermarket-anc-algorithms/index.html")).text();
+        // console.log(html_doc)
+        rendering_frame.srcDoc = html_doc //item.download_url; //"http://localhost:63342/TeachMeToDance/research.kabeersnetwork.tk.-file-loader.html?_ijt=4p8pl3mvomtiocfujv23ukgj7&_ij_reload=RELOAD_ON_SAVE";
+
+        await new Promise(resolve => rendering_frame.addEventListener("load", resolve));
+        // await onload;
+        const content = (rendering_frame.contentDocument || rendering_frame.contentWindow.document);
+        // console.log(content);
+        const text = [];
+        content.querySelectorAll("p").forEach((el) => text.push(el.innerText))
+        return ({
+            heading: content.querySelector("h1:first-of-type")?.innerHTML || "",
+            excerpt: text.join().substring(0, 100),
+            image: (await window.html2canvas(rendering_frame)).toDataURL('image/png')
+        })
+        // rendering_frame.addEventListener("load", async () => {
+        //     ;
+        //     console.log(rendering_frame.contentDocument || rendering_frame.contentWindow.document)
+        // })
+        // const parser = new DOMParser();
+        // const html_doc = parser.parseFromString(await , 'text/html');
+    }
+
+
+    const rendering_frame = document.querySelector(".rendering-frame");
+    const base = (path) => `https://cors.bridged.cc/https://api.github.com/repos/kabeer11000/docs-hosted/contents/law.research.kabeersnetwork.tk/blog${path ? "" + path : ""}?ref=redirector-content`
+    const fetch_folder = async (path) => {
+        const response = await fetch(base(path))
+        return response.json();
+    }
+    const Articles = [];
+    const get_files_from_folder = async (path) => {
+        let files = new Set();
+        const folder = await fetch_folder(path);
+        for (const item of folder) {
+            if (item.type === "dir") files = new Set([...files, ...await get_files_from_folder(`${path ?? ""}/${item.name}`)]);
+            if (item.name === "index.html") files.add(item);
+        }
+        return files;
+    }
+    // console.log(domtoimage)
+    const getArticle = (item) => new Promise(async resolve => {
+        const html_doc = await (await fetch("https://cdn.jsdelivr.net/gh/kabeer11000/docs-hosted@redirector-content/" + item.path)).text();
+        rendering_frame.src = URL.createObjectURL(new Blob([`<base href="https://cdn.jsdelivr.net/gh/kabeer11000/docs-hosted@redirector-content/${item.path}"/>`, html_doc], {
+            type: "text/html"
+        }));
+        window.addEventListener("message", async () => {
+            const content = (rendering_frame.contentDocument || rendering_frame.contentWindow.document);
+            const text = [];
+            content.querySelectorAll("p,pre").forEach((el) => text.push(el.textContent))
+            resolve({
+                heading: content.querySelector("h1,h2")?.textContent || "",
+                excerpt: text.join().substring(0, 100),
+                image: await domtoimage.toBlob(content.querySelector("div.container"))
+            });
+            // console.log("done")
+        });
+    });
+    const files = await get_files_from_folder();
+    for (const file of files) Articles.push(await getArticle(file));
+    console.log(Articles)
+    // }));
+    // console.log("AA")
+    // files.map(a => getArticle(files[0]).then(console.log))
+    // get_files_from_folder().then((d) => {
+    //     console.log([...d])
+    // });
+    // const articles = new Set([]);
+
+</script>
+<!--<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>-->
+<!--<script src="https://raw.githubusercontent.com/1904labs/dom-to-image-more/master/dist/dom-to-image-more.min.js"></script>-->
+</body>
+</html>

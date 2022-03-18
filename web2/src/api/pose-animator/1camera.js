@@ -14,7 +14,11 @@
  * limitations under the License.
  * =============================================================================
  */
+// import '@tensorflow/tfjs-backend-webgl';
 
+import * as tf from '@tensorflow/tfjs';
+// require('@tensorflow/tfjs-backend-wasm');
+// import '@tensorflow/tfjs-backend-webgl';
 import * as posenet_module from '@tensorflow-models/posenet';
 import * as facemesh_module from '@tensorflow-models/facemesh';
 import * as paper from 'paper';
@@ -30,6 +34,7 @@ import * as abstractSVG from './resources/illustration/abstract.svg';
 import * as blathersSVG from './resources/illustration/blathers.svg';
 import * as tomNookSVG from './resources/illustration/tom-nook.svg';
 import aggregation from "../../utilities/aggregation";
+import {isMobile} from "./utils/demoUtils";
 
 class Parameters {
 // Camera stream video element
@@ -80,32 +85,19 @@ class Parameters {
         // this.videoHeight *= 0.7;
         // }
 
-        this.canvasScope = paper.default;
-        this.canvas = document.querySelector('.illustration-canvas');
-        this.canvas.width = this.canvasWidth;
-        this.canvas.height = this.canvasHeight;
-        this.canvasScope.setup(this.canvas);
-        this.videoCtx = this.canvas.getContext('2d')
-
     }
 
-    async UpdateAvatar(target) {
-        let svgScope = await SVGUtils.importSVG(target /* SVG string or file path */);
-        let skeleton = new Skeleton(svgScope);
-        this.illustration = new PoseIllustration(this.canvasScope);
-        this.illustration.bindSkeleton(skeleton, svgScope);
-    }
 }
 
 class Draw extends Parameters {
     illustration = null
 
-    constructor() {
-        super();
-    }
+    // constructor() {
+    //     super();
+    // }
 
-    DrawFrame = async ({poses}) => {
-        this.keypointCtx.clearRect(0, 0, this.videoWidth, this.videoHeight);
+    async DrawFrame({poses}) {
+        // this.keypointCtx.clearRect(0, 0, this.videoWidth, this.videoHeight);
         this.canvasScope.project.clear();
 
         if (poses.length >= 1 && this.illustration) {
@@ -127,7 +119,8 @@ class Draw extends Parameters {
         this.canvasScope.project.activeLayer.scale(
             this.canvasWidth / this.videoWidth,
             this.canvasHeight / this.videoHeight,
-            new this.canvasScope.Point(0, 0));
+            new this.canvasScope.Point(0, 0)
+        );
 
         // End monitoring code for frames per second
         // stats.end();
@@ -152,35 +145,66 @@ class Detect extends aggregation(Parameters, Draw) {
         this.videoCtx.save();
         this.videoCtx.scale(-1, 1);
         this.videoCtx.translate(-this.videoWidth, 0);
-        const img = new Image(this.videoWidth);
-        img.src = "https://thumbs.dreamstime.com/z/handsome-man-standing-relaxed-front-view-handsome-elegant-man-moccasins-gray-trousers-white-shirt-standing-relaxed-front-173443511.jpg"
-        this.videoCtx.drawImage(img, 0, 0, this.videoWidth, this.videoHeight);
+        // const img = new Image(this.videoWidth, this.videoWidth);
+        // img.src = "https://st4.depositphotos.com/1007995/21172/i/1600/depositphotos_211724202-stock-photo-young-casual-man-standing-posing.jpg"
+        // img.src = "https://thumbs.dreamstime.com/z/handsome-man-standing-relaxed-front-view-handsome-elegant-man-moccasins-gray-trousers-white-shirt-standing-relaxed-front-173443511.jpg"
+        this.videoCtx.drawImage(this.video, 0, 0, this.videoWidth, this.videoHeight);
         this.videoCtx.restore();
+        // img.crossOrigin = 'anonymous'
 
         // Creates a tensor from an image
-        // const input = tf.browser.fromPixels(this.canvas);
+        const input = tf.browser.fromPixels(this.canvas);
         // console.log(input)
         // this.faceDetection = await this.facemesh.estimateFaces(input, false, false);
+        // await new Promise((resolve => img.onload = resolve));
         let all_poses = await this.posenet.estimatePoses(this.video, {
             flipHorizontal: true,
-            decodingMethod: 'multi-person',
+            decodingMethod: 'single-person',
             maxDetections: 1,
             scoreThreshold: this.minPartConfidence,
             nmsRadius: this.nmsRadius
         });
         poses = poses.concat(all_poses);
-        // input.dispose();
-        return poses;
+        // console.log(all_poses)
+        input.dispose();
+        return [poses, this.faceDetection];
     }
 }
 
-export class PoseAnimator extends aggregation(Parameters, Draw, Detect) {
+export class PoseAnimator extends aggregation(Parameters, Detect, Draw) {
     #Props = {}
 
-    constructor({SVG, MediaStream, Video}) {
+    constructor({VideoCanvas, SVG, MediaStream, Video, Canvas}) {
         super();
-        this.#Props = {SVG, MediaStream, Video}
+        this.#Props = {VideoCanvas, SVG, MediaStream, Video, Canvas}
+        // this.#Props.MediaStream
+        this.mobile = isMobile();
+        if (this.mobile) {
+            this.canvasWidth = Math.min(window.innerWidth, window.innerHeight);
+            this.canvasHeight = this.canvasWidth;
+            this.videoWidth *= 0.7;
+            this.videoHeight *= 0.7;
+        }
+
+        this.canvasScope = paper.default;
+        this.canvas = Canvas;
+        this.videoCanvas = VideoCanvas;
+        this.canvas.width = this.canvasWidth;
+        this.canvas.height = this.canvasHeight;
+        this.canvasScope.setup(this.canvas);
+        this.videoCtx = this.videoCanvas.getContext('2d');
+        this.canvasScope.project.clear();
+
+
         // this.#loader({SVG, MediaStream, Video})
+    }
+
+    async UpdateAvatar(target) {
+        let svgScope = await SVGUtils.importSVG("https://cdn.jsdelivr.net/gh/yemount/pose-animator/resources/illustration/boy.svg");
+        let skeleton = new Skeleton(svgScope);
+        this.illustration = new PoseIllustration(this.canvasScope);
+        // console.log(skeleton, this.illustration, svgScope)
+        this.illustration.bindSkeleton(skeleton, svgScope);
     }
 
     async Build() {
@@ -192,7 +216,8 @@ export class PoseAnimator extends aggregation(Parameters, Draw, Detect) {
             multiplier: this.defaultMultiplier,
             quantBytes: this.defaultQuantBytes
         }), facemesh_module.load()])).map(response => response.value);
-        console.log(this.posenet, this.facemesh)
+        await this.UpdateAvatar();
+        console.log(facemesh_module.load());
         // await this.UpdateAvatar(this.#Props.SVG);
 
         // const video = Video;
@@ -208,19 +233,3 @@ export class PoseAnimator extends aggregation(Parameters, Draw, Detect) {
     }
 }
 
-navigator.mediaDevices.getUserMedia({
-    'audio': false,
-    'video': {
-        facingMode: 'user',
-        width: 200,
-        height: 200,
-    },
-}).then(async video => {
-    const _p = new PoseAnimator({
-        SVG: girlSVG.default,
-        Video: document.getElementById("video"),
-        MediaStream: video
-    })
-    await _p.Build();
-    console.log(await _p.DetectFrame());
-})
