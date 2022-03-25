@@ -137,7 +137,6 @@ export default function AppTabbedLayout() {
                             height: "100vh",
                             objectFit: "cover"
                         }} ref={canvasRef} className="camera-canvas" id="output"/>
-
                         <video autoPlay={true} ref={videoRef} style={{
                             width: "4rem",
                             height: "6rem",
